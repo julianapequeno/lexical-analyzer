@@ -1,7 +1,6 @@
 struct Analisador{
     entrada: String,
-    posicao: usize,
-    tam: usize
+    posicao: usize
 }
 
 /// Retorna se a string é vazia.
@@ -13,33 +12,20 @@ fn is_empty(s: String) -> bool{
 }
 /// Remove o caracter na posição (em bytes) `i`
 /// e o retorna.
-fn remove(s: &mut String) -> String{
-    let mut result = String::new();
-    *s = s[1..].to_string();
-
-    for (index, c) in s.chars().enumerate() {
-        if index == 0 {
-            continue;
-        } else {
-            result.push(c);
-        }
-
-    }
-
-    return result;
+fn remove(s: String, i: usize) -> String{
+    return s[i..].to_string();
 }
 
 impl Analisador {
     fn novo(entrada: String) -> Self {
         Analisador {
             entrada,
-            posicao: 0,
-            tam: 0,
+            posicao: 0
         }
     }
     
-    fn próximo_car(&mut self) -> String{
-        let c = remove(&mut self.entrada);
+    fn próximo_car(&mut self, i: usize) -> String{
+        let c = remove(self.entrada.clone(),i);
         //let p = self.posicao;
         self.posicao +=1;
         c
@@ -54,7 +40,6 @@ impl Analisador {
                     self.posicao += 1;
                     match c {
                         '+' | '-' => {  self.posicao += 1;
-                                        self.tam += numero.len();
                                         return (true, (self.posicao - 1), c.to_string());
                                      } ,
                         '0' ..='9' => {
@@ -68,16 +53,14 @@ impl Analisador {
                                             numero.push(c);
                                             contador += 1;
                                         } else {
-                                            self.tam += numero.len();
                                             return (true, (self.posicao - 1), numero);
                                         }
                                     }
                                 }
                             }
-                        }
+                        },
                         ' ' => continue,    
                         _ => {
-                            self.tam += 1;
                             return (false, (self.posicao - 1), c.to_string());
                         }
                     }
@@ -88,6 +71,7 @@ impl Analisador {
 
     fn devolver(&mut self, pos: usize, s: String) {
         //caso precise analisar um elemento léxico à frente.
+    //s println!("{} e {}",s,pos);
         self.entrada = s;
         self.posicao = pos;
     }
@@ -114,11 +98,16 @@ fn engine(entrada: String){
         }
         
         let mut c: String = "0".to_string();
-        for _i in 0..s.len(){
-            c = a.próximo_car();
+        println!("{}",s.len());
+        if s.len() == 1{
+            c = a.próximo_car(s.len());
+        }else{
+            c = a.próximo_car(s.len()-1);
         }
-        a.devolver(0,c); // Devolve para o analisador
+        println!("ESSE: {c}");
+        a.devolver(s.len(),c); // Devolve para o analisador
         //Passa para o próximo
+        //break;
     }
     println!("");
 }
