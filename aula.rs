@@ -1,6 +1,7 @@
 struct Analisador{
     entrada: String,
-    posicao: usize
+    posicao: usize,
+    tam: usize
 }
 
 /// Retorna se a string é vazia.
@@ -33,6 +34,7 @@ impl Analisador {
         Analisador {
             entrada,
             posicao: 0,
+            tam: 0,
         }
     }
     
@@ -52,30 +54,29 @@ impl Analisador {
                     self.posicao += 1;
                     match c {
                         '+' | '-' => {  self.posicao += 1;
-                                        return (true, self.posicao - 1, c.to_string());
+                                        self.tam += numero.len();
+                                        return (true, (self.posicao - 1)+self.tam, c.to_string());
                                      } ,
                         '0' ..='9' => {
                             numero.push(c);
                             let mut contador = 1;
                             loop {
-                              //  println!("{}",self.entrada);
-                               // println!("cc {}",self.posicao + contador);
                                 match self.entrada.chars().nth((self.posicao + contador)-1){
-                                    None => return (true, self.posicao - 1, numero),
+                                    None => return (true, (self.posicao - 1)+self.tam, numero),
                                     Some(c) => {
-                                       // println!("AA: {c}");
                                         if c.is_numeric() {
                                             numero.push(c);
                                             contador += 1;
                                         } else {
-                                            return (true, self.posicao - 1, numero);
+                                            self.tam += numero.len();
+                                            return (true, (self.posicao - 1)+self.tam, numero);
                                         }
                                     }
                                 }
                             }
                         }
                         ' ' => continue,    
-                        _ => return (false, self.posicao - 1, c.to_string()),
+                        _ => return (false, (self.posicao - 1)+self.tam, c.to_string()),
                     }
                 },
             }
@@ -89,9 +90,14 @@ impl Analisador {
     }
 }
 
+fn leitura() -> String{
+    let mut s = String::new();
+    std::io::stdin().read_line(&mut s).unwrap();
+    return s;
+}
 
-fn main() {
-    let entrada = String::from("240 + 20");  
+
+fn engine(entrada: String){
     let mut a = Analisador::novo(entrada);
     loop{
         let (b,u,s) = a.próximo();
@@ -99,19 +105,27 @@ fn main() {
         if !b{
             break;
         }
-        //println!("{}",a.entrada.clone());
         if is_empty(a.entrada.clone()){
             break;
         }
         
         let (mut p, mut c): (usize, String) = (0,"0".to_string());
         for _i in 0..s.len(){
-            println!("{}",s.len());
             (p,c) = a.próximo_car();
         }
-        println!("{p} e {c}");
         a.devolver(0,c); // Devolve para o analisador
         //Passa para o próximo
+    }
+}
+
+
+fn main() {
+    loop{
+        println!("> Press Ctrl+C if you want to exit the program");
+
+        let entrada = String::from(leitura());  
+
+        engine(entrada);
     }
     println!("Finalizado!");
 }
