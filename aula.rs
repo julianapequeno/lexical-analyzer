@@ -109,8 +109,8 @@ fn main() {
             println!("{}",s.len());
             (p,c) = a.próximo_car();
         }
-        println!("{p} ee {c}");
-        a.devolver(p,c); // Devolve para o analisador
+        println!("{p} e {c}");
+        a.devolver(0,c); // Devolve para o analisador
         //Passa para o próximo
     }
     println!("Finalizado!");
